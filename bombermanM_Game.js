@@ -114,20 +114,8 @@ Game.prototype={
 			setTimeout(run,fps);
 		}
 		
-		var tTeam=Array('blue','red','green','yellow');
-		for(var i=0;i<tTeam.length;i++){
-			var a = getById('button-'+tTeam[i]);
-			if(tTeam[i]==team){
-				a.className='buttonOn';
-			}else{
-				a.className='button';
-			}
-		}
-		
 		getById('team').style.display='none';
-		
-		console.log('setTeam : '+team);
-		
+				
 		map.build();
 		this.refresh();
 	},
@@ -136,9 +124,6 @@ Game.prototype={
 		oGame.refreshPerso();
 		//et les bombes
 		oGame.refreshBomb();
-	},
-	newGame:function(){
-		socket.emet('newGame');
 	},
 	getPersoById:function(id){
 		for(var i=0;i< this.tPerso.length;i++){
@@ -178,15 +163,6 @@ Game.prototype={
 	disableSound:function(){
 		this.bSound=0;
 	},
-	rebuild:function(){
-		map.rebuild();
-		
-		oLayer_perso.clear();
-		for(var i=0;i< this.tPerso.length;i++){
-			this.tPerso[i].build();
-		}
-		
-	},
 	checkCoord:function(x,y){
 		y=parseInt(y+0);
 		x=parseInt(x+0);
@@ -208,7 +184,6 @@ Game.prototype={
 		return false;
 
 	},
-	
 	isWalkable:function(x,y){
 		if(this.tCoordBomb[y] && this.tCoordBomb[y][x] && this.tCoordBomb[y][x]!=''){
 			return false;
@@ -219,11 +194,9 @@ Game.prototype={
 		}
 		return true;
 	},
-	
 	resetKeys:function(){
 		this.setTeamDirectionBroadcast('');
 	},
-	
 	eventKeyDown:function(e){
 		var touche = e.keyCode;
 

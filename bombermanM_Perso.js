@@ -113,7 +113,7 @@ Perso.prototype={
 		this.tmpIdImg=tmpImg;
 		
 		//partie affichage de l'image de l'unité sur le canvas
-		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase)-20,(this.y*heightCase)-50,widthCase*2,widthCase*2,'perso');
+		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase)-20,(this.y*heightCase)-20,widthCase,widthCase,'perso');
 		
 		oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase)-25,8,8,this.team);
 		

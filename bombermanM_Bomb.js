@@ -101,7 +101,7 @@ Bomb.prototype={
 		
 		//oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase),4,4,this.team);
 		
-		oImages.drawImageOnLayer(this.idImg,(this.x*widthCase)-20,(this.y*heightCase)-20,widthCase*2,widthCase*2,'bomb');
+		oImages.drawImageOnLayer(this.idImg,(this.x*widthCase),(this.y*heightCase),widthCase,widthCase,'bomb');
 			
 		//on enregistre les nouvelles coordonnées de l'unité
 		oGame.saveBomb(this);
