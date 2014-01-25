@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8">
+    <title>Bomberman</title>
+ 
+    <!-- meta -->
+    <meta name="description" content="" />
+    <meta name="keywords" content="" />
+    <meta name="author" content="" />
+
+	<script src="http://localhost:1338/socket.io/socket.io.js"></script>
+	<script src="lib3/main.js"></script>    
+	<script src="lib3/canvas.js"></script>    
+	<script src="bombermanM.js"></script>
+	<script src="bombermanM_Map.js"></script>
+	<script src="bombermanM_Perso.js"></script>
+	<script src="bombermanM_Bomb.js"></script>
+    <script src="bombermanM_Sound.js"></script>
+    
+    <script src="bombermanM_Game.js"></script>
+	<style>
+	body{
+		background:#000;
+	}
+	*{
+		font-family:arial;
+		font-size:11px;
+	}
+	#loading{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:900px;
+		height:800px;
+		background:#000000;
+		color:white;
+		text-align:center;
+		padding-top:400px;
+	}
+	#team{
+		display:none;
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:900px;
+		height:800px;
+		background:#000000;
+		color:white;
+		text-align:center;
+		padding-top:400px;
+	}
+	#layer_map, #layer_bomb, #layer_perso{
+		position:absolute;
+		top:0px;
+		width:900px;
+		height:600px;
+	}
+	#layer_map{
+		//background:url('img3/case-water.png');
+	}
+	#content{
+		position:absolute;
+		top:0px;
+		left:0px;
+		width:900px;
+		height:700px;
+	}
+	#menu{
+		position:absolute;
+		width:900px;
+		top:700px;
+		left:0px;
+		height:20px;
+		background:black;
+		color:white;
+		padding-top:2px;
+		font-family:verdana;
+		font-weight:bold;
+                border-right:1px solid white;
+	}
+	#nav{
+		position:absolute;
+		top:620px;
+		left:0px;
+		width:880px;
+		height:244px;
+		background:#222;
+		padding:10px;
+                border-right:1px solid white;
+                border-bottom:1px solid white;
+	}
+	#nav h1{
+		color:white;
+		font-size:12px;
+		}
+	#nav h2{
+		color:white;
+		font-size:12px;
+		border-bottom:1px solid white;
+		}
+	#nav2{
+		position:absolute;
+		top:600px;
+		left:0px;
+		width:1200;
+		height:100px;
+		background:#000;
+		text-align:right;
+		
+	}
+	.btnImage{
+		width:20px;
+		padding:4px;
+		background:white;
+		border:3px solid #ccc;
+	}
+	.btnImageOff{
+		width:20px;
+		padding:4px;
+		background:#970e0e;
+		border:3px solid #970e0e;
+	}
+	.curseur td{
+		padding:0px;
+		margin:0px;
+	}
+	.curseur input{
+		margin:0px;
+	}
+	#sound{
+		position:absolute;
+		top:830px;
+		left:700px;
+		color:white;
+	}
+	 
+	.button,.buttonOn{
+		display:block;
+		margin-bottom:10px;
+		border:2px solid gray;
+		background:#eee;
+		color:black;
+		padding:4px;
+		width:200px;
+		margin:0px auto;
+	}
+	.buttonOn{
+		background:darkblue;
+		color:white;
+	}
+	</style>
+	
+	</head>
+	<body onload="preload()" onkeydown="oGame.eventKeyDown(event)">
+
+		<div id="content"  >
+		<canvas id="layer_map" width="900" height="700"></canvas>
+		<canvas id="layer_perso" width="900" height="700"></canvas>
+		<canvas id="layer_bomb" width="900" height="700"></canvas>
+		
+		</div>	
+		
+		<div id="loading">Loading...</div>
+                
+        <div id="sound"><input checked="checked" type="checkbox" id="soundEnabled" onclick="oGame.switchSound(this)"> Son</div>
+
+
+		<div id="team">
+			<h2>Choisissez votre team:</h2>
+			<a id="button-blue" class="button" onclick="oGame.setTeam('blue')" href="#blue">Blue</a>
+			<br />
+			<a id="button-red" class="button" onclick="oGame.setTeam('red')" href="#red">Red</a>
+			<br />
+			<a id="button-green" class="button" onclick="oGame.setTeam('green')" href="#green">Green</a>
+			<br />
+			<a id="button-yellow" class="button" onclick="oGame.setTeam('yellow')" href="#yellow">Yellow</a>
+			
+			
+		</div>
+	</body>
+</html>
