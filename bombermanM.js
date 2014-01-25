@@ -124,10 +124,9 @@ function preload(){
 		}
 	}
 	
-	oImages.add('img3/bomberman1x1.png','1x1');
+	oImages.add('img4/bomberman1x1.png','1x1');
 	
 	
-	//oSound.add('img3/attack.mp3','attack');
 
 	oImages.load();
 	
