@@ -36,28 +36,21 @@ function Game(){
 		oPerso.y=y;
 		oPerso.id=id;
 		oPerso.build();
-		
-		console.log('creation perso team:'+team+' x:'+x+' y:'+y);
-		
+				
 		oGame.tPerso.push(oPerso);
 	});
-	
 	socket.on('Game.removePersoById',function(id){
-		console.log('local removePersoById '+id);
 		var oPerso=oGame.getPersoById(id);
 		if(oPerso){
 			oPerso.clear();
 		}
 	});
-	
 	socket.on('Game.removeBombById',function(id){
-		console.log('local removeBombById '+id);
 		var oBomb=oGame.getBombById(id);
 		if(oBomb){
 			oBomb.clear();
 		}
 	});
-	
 	socket.on('Perso.build',function(id,x,y){
 		var oPerso=oGame.getPersoById(id);
 		oPerso.clear();
@@ -88,7 +81,6 @@ function Game(){
 	});
 	
 	socket.on('Game.createBomb',function(id,team,name,x,y){
-		
 		var oBomb=new Bomb(name,team);
 		oBomb.x=x;
 		oBomb.y=y;
@@ -96,9 +88,6 @@ function Game(){
 		oBomb.build();
 		
 		oGame.tBomb.push(oBomb);
-		
-		console.log('afficahge bombe: x:'+oBomb.x+' :'+oBomb.y);
-		
 		
 	});
 	
@@ -351,7 +340,6 @@ Game.prototype={
 	},
 	refreshPerso:function(){
 		
-		
 		//on boucle sur les persos existants
 		for(var i=0;i< this.tPerso.length;i++){
 			var oPerso= this.tPerso[i];
@@ -372,33 +360,27 @@ Game.prototype={
 				var newX=oPerso.x;
 				var newY=oPerso.y;
 				
-				//on fait evoluer les coordonnées vers la destination
+				//on fait evoluer les coordonnées en fonction de la direction
 				if(sDirection=='right'){
 					newX+=vitesse;
 				}else if(sDirection=='left'){
 					newX-=vitesse;
 				}
-				
 				if(sDirection=='up'){
 					newY-=vitesse;
 				}else if(sDirection=='down'){
 					newY+=vitesse;
 				}
 				
-				
 				if(this.checkCoord(newX,newY)){
-					//si la coordonnées est libre
+					//si les coordonnées est libre
 					oPerso.x=newX;
 					oPerso.y=newY;
 					
-					//oPerso.action='walking';
-					
-					//oPerso.animateBroadcast('walking');
 				}
 				
-				//on dessine l'unité
+				//on dessine le personnage
 				oPerso.buildBroadcast('walking');
-				//oPerso.animateBroadcast('walking');
 				
 			
 		}
