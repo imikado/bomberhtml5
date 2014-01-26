@@ -114,6 +114,8 @@ function preload(){
 		],
 		[
 			'explosion',
+			'explosion-1',
+			'explosion-2',
 		],
 		
 		
@@ -176,9 +178,6 @@ function load(){
 	//on construit la map, l'apercu 
 	//et le cadre d'information de la map affichée	 
 	map.build(); 
-	
-	//on affiche les batiments sur la carte
-	oGame.rebuild();
 	
 }
 

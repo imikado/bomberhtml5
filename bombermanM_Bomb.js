@@ -20,8 +20,6 @@ function Bomb(name,team){
 	this.shortname='Bomb';
 	this.idImg='bomb-0';
 	this.life=1;
-		
-		
 	
 }
 Bomb.prototype={
@@ -70,17 +68,23 @@ Bomb.prototype={
 	},
 	build:function(){
 		
-		oLayer_bomb.clearRect((this.x*widthCase)-20,(this.y*heightCase)-20,widthCase*2,widthCase*2);
-		
-		if(this.idImg=='explosion'){
+		if(this.idImg=='explosion' || this.idImg=='explosion-1' || this.idImg=='explosion-2'){
 			for(var i=-2;i< 3;i++){
-				oImages.drawImageOnLayer(this.idImg,((this.x+i)*widthCase)-20,(this.y*heightCase)-20,widthCase*2,widthCase*2,'bomb');
-				oImages.drawImageOnLayer(this.idImg,((this.x)*widthCase)-20,((this.y+i)*heightCase)-20,widthCase*2,widthCase*2,'bomb');
+				oLayer_bomb.clearRect(((this.x+i)*widthCase),(this.y*heightCase),widthCase,widthCase);
+				oLayer_bomb.clearRect(((this.x)*widthCase),((this.y+i)*heightCase),widthCase,widthCase);
+				
+				if(map.tMap[this.y][this.x+i]==1){
+					oImages.drawImageOnLayer(this.idImg,((this.x+i)*widthCase),(this.y*heightCase),widthCase,widthCase,'bomb');
+				}
+				if(map.tMap[this.y+i][this.x]==1){
+					oImages.drawImageOnLayer(this.idImg,((this.x)*widthCase),((this.y+i)*heightCase),widthCase,widthCase,'bomb');
+				}
 			}
-		}else if(this.idImg=='explosion-2'){
+		
+		}else if(this.idImg=='explosion-finish'){
 			for(var i=-2;i< 3;i++){
-				oLayer_bomb.clearRect(((this.x+i)*widthCase)-20,(this.y*heightCase)-20,widthCase*2,widthCase*2);
-				oLayer_bomb.clearRect(((this.x)*widthCase)-20,((this.y+i)*heightCase)-20,widthCase*2,widthCase*2);
+				oLayer_bomb.clearRect(((this.x+i)*widthCase),(this.y*heightCase),widthCase,widthCase);
+				oLayer_bomb.clearRect(((this.x)*widthCase),((this.y+i)*heightCase),widthCase,widthCase);
 				
 				var oPersoVictim=oGame.getPerso(this.x+i,this.y);
 				if(oPersoVictim){
@@ -97,15 +101,13 @@ Bomb.prototype={
 			
 			oGame.removeBroadcastBombById(this.id);
 			return;
+		}else{
+			oLayer_bomb.clearRect((this.x*widthCase),(this.y*heightCase),widthCase,widthCase);
 		}
-		
-		//oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase),4,4,this.team);
-		
+				
 		oImages.drawImageOnLayer(this.idImg,(this.x*widthCase),(this.y*heightCase),widthCase,widthCase,'bomb');
 			
-		//on enregistre les nouvelles coordonnées de l'unité
 		oGame.saveBomb(this);
-		
 		
 	},
 	clear:function(){

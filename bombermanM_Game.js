@@ -314,27 +314,31 @@ Game.prototype={
             
 		for(var i=0;i< this.tBomb.length;i++){
 			var oBomb= this.tBomb[i];
-			if(oBomb.life < 10){
+			if(oBomb.life < 14){
+				//pendant 14 iterations, on va alterner entre deux sprites
+				if(oBomb.life % 2 ){
 				oBomb.idImg='bomb-0';
-			}else if(oBomb.life < 20){
+				}else{
 				oBomb.idImg='bomb-1';
-			}else if(oBomb.life < 30){
-				oBomb.idImg='bomb-2';
-			}else if(oBomb.life < 40){
-				oBomb.idImg='explosion';
-			}else{
+				}	
+			}else if(oBomb.life < 17){
+				//puis animation d'explosion
+				if(oBomb.life % 2 ){
+					oBomb.idImg='explosion';
+				}else{
+					oBomb.idImg='explosion-1';
+				}
+			}else if(oBomb.life < 19){
 				oBomb.idImg='explosion-2';
+			}else{
+				oBomb.idImg='explosion-finish';
 				
 			}
 			
 			oBomb.life++;
 			
-			
-			console.log('life:'+oBomb.life);
+			//on broadcast l'animation de la bombe
 			oBomb.animateBroadcast(oBomb.idImg);
-		
-		
-			
 		}
                 
 	},
@@ -359,20 +363,30 @@ Game.prototype={
 				//on initialise les nouvelles coordonnées
 				var newX=oPerso.x;
 				var newY=oPerso.y;
+				var newXcheck=oPerso.getX();
+				var newYcheck=oPerso.getY();
 				
-				//on fait evoluer les coordonnées en fonction de la direction
-				if(sDirection=='right'){
+				
+				if(newY != parseInt(newY)){
+					//si entre deux cases, on ne peut pas descendre/monter
+				}else if(sDirection=='right'){
 					newX+=vitesse;
+					newXcheck+=1;
 				}else if(sDirection=='left'){
 					newX-=vitesse;
+					newXcheck-=1;
 				}
-				if(sDirection=='up'){
+				if(newX != parseInt(newX)){
+					//si entre deux cases, on ne peut pas descendre/monter
+				}else if(sDirection=='up'){
 					newY-=vitesse;
+					newYcheck-=1;
 				}else if(sDirection=='down'){
 					newY+=vitesse;
+					newYcheck+=1;
 				}
 				
-				if(this.checkCoord(newX,newY)){
+				if(this.checkCoord(newXcheck,newYcheck)){
 					//si les coordonnées est libre
 					oPerso.x=newX;
 					oPerso.y=newY;

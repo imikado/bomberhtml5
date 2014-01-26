@@ -59,39 +59,6 @@ Perso.prototype={
 		socket.emit('Perso.animateBroadcast',this.id,action);
 	},
 	animate:function(action){
-		/*
-		oLayer_perso.clearRect(((this.x-currentX)*widthCase),((this.y-currentY)*heightCase),widthCase-2,widthCase-2);
-
-		var tmpImg;
-		if(action=='walking'){
-			
-			var sDirection=oGame.tDirection[this.team];
-			
-			if(sDirection==''){
-				tmpImg=this.idImg;
-			}else if(this.tmpIdImg==this.idImg+'_walking2'+sDirection){
-				tmpImg=this.idImg+'_walking'+sDirection;
-			
-			}else{
-				tmpImg=this.idImg+'_walking2'+sDirection;
-			}
-			
-			this.stopSound();
-			this.tmpIdImg=tmpImg;
-		}else if(action=='dead'){
-			this.playSound('dead',this.action);
-			return;
-		}else if(action=='stand'){
-			tmpImg=this.idImg;
-		}
-		
-		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase),(this.y*heightCase),widthCase-2,widthCase-2,'perso');
-		
-		oLayer_perso.fillRect(this.x*widthCase,(this.y*heightCase),4,4,this.team);
-		
-		this.action=action;
-		
-		oGame.savePerso(this);*/
 	},
 	//broadcast
 	buildBroadcast:function(){
@@ -101,25 +68,26 @@ Perso.prototype={
 		
 		
 		var sDirection=oGame.tDirection[this.team];
-			
+		
+		//si pas de direction, on affiche l'image statique	
 		if(sDirection==''){
 			tmpImg=this.idImg;
+		//si l'image précédente était marche 2, on affiche marche 1
 		}else if(this.tmpIdImg==this.idImg+'_walking2'+sDirection){
 			tmpImg=this.idImg+'_walking'+sDirection;
-		
+		//sino on affiche la marche 2
 		}else{
 			tmpImg=this.idImg+'_walking2'+sDirection;
 		}
 		this.tmpIdImg=tmpImg;
 		
-		//partie affichage de l'image de l'unité sur le canvas
-		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase)-20,(this.y*heightCase)-20,widthCase,widthCase,'perso');
+		//partie affichage de l'image du personnage sur le canvas
+		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase),(this.y*heightCase)-10,widthCase,widthCase,'perso');
 		
+		//on affiche ici un carré représentant la couleur de la team
 		oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase)-25,8,8,this.team);
 		
-		
-		
-		//on enregistre les nouvelles coordonnées de l'unité
+		//on enregistre les nouvelles coordonnées du joueur
 		oGame.savePerso(this);
 		
 	},
