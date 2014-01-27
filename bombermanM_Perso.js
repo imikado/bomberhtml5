@@ -83,6 +83,7 @@ Perso.prototype={
 		
 		//partie affichage de l'image du personnage sur le canvas
 		oImages.drawImageOnLayer(tmpImg,(this.x*widthCase),(this.y*heightCase)-10,widthCase,widthCase,'perso');
+		//oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase),widthCase,widthCase,this.team);
 		
 		//on affiche ici un carré représentant la couleur de la team
 		oLayer_perso.fillRect((this.x*widthCase),(this.y*heightCase)-25,8,8,this.team);

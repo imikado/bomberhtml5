@@ -91,6 +91,22 @@ function Game(){
 		
 	});
 	
+	socket.on('Game.listTeam',function(tTeamConnected){
+		
+		console.log('reception liste team');
+		
+		for(var i=0;i< tTeamConnected.length;i++){
+			console.log('desactivation '+tTeamConnected[i]);
+			var a=getById('button-'+tTeamConnected[i]);
+			if(a){
+				console.log('desactivation btn "'+ 'btn-'+tTeamConnected[i]);
+				a.style.display='none';
+			}else{
+				console.log('trouve pas  btn "'+ 'btn-'+tTeamConnected[i]);
+			}
+		}
+		
+	});
 	
 	
     
@@ -107,6 +123,8 @@ Game.prototype={
 				
 		map.build();
 		this.refresh();
+		
+		socket.emit('setTeamBroadcast',team);
 	},
 	refresh:function(){
 		//on raffraichit les persos
@@ -189,19 +207,7 @@ Game.prototype={
 	eventKeyDown:function(e){
 		var touche = e.keyCode;
 
-		this.resetKeys();
-		if(touche==37){
-			this.setTeamDirectionBroadcast('left');
-		}
-		if(touche==38){
-			this.setTeamDirectionBroadcast('up');
-		}
-		if(touche==39){
-			this.setTeamDirectionBroadcast('right');
-		}
-		if(touche==40){
-			this.setTeamDirectionBroadcast('down');
-		}
+		//this.resetKeys();
 		
 		if(touche==32){ //espace
 			console.log('depot bombe');
@@ -209,8 +215,20 @@ Game.prototype={
 			var oPerso=this.getPersoByTeam(this.team);
 				
 			this.createBombBroadcast(oPerso.team,'normal',oPerso.getX(),oPerso.getY());
+			
+			//this.setTeamDirectionBroadcast(this.tDirection[sTeam]);
 				
+		}else	if(touche==37){
+			this.setTeamDirectionBroadcast('left');
+		}else	if(touche==38){
+			this.setTeamDirectionBroadcast('up');
+		}else if(touche==39){
+			this.setTeamDirectionBroadcast('right');
+		}else if(touche==40){
+			this.setTeamDirectionBroadcast('down');
 		}
+		
+		
 	},
 	setTeamDirection:function(sTeam,sDirection){
 		this.tDirection[sTeam]=sDirection;
@@ -219,7 +237,10 @@ Game.prototype={
 		socket.emit('Game.setTeamDirectionBroadcast',this.team,sDirection);
 	},
 	eventKeyUp:function(e){
-		this.resetKeys();
+		var touche = e.keyCode;
+		if(touche!=32){
+			this.setTeamDirectionBroadcast('');
+		}
 	},
 	saveBomb:function(oBomb){
         //on recupere les coordonnées du batiment 
@@ -368,6 +389,7 @@ Game.prototype={
 				
 				
 				if(newY != parseInt(newY)){
+					console.log('entre deux y: on peut pas gauche/droite');
 					//si entre deux cases, on ne peut pas descendre/monter
 				}else if(sDirection=='right'){
 					newX+=vitesse;
@@ -377,6 +399,7 @@ Game.prototype={
 					newXcheck-=1;
 				}
 				if(newX != parseInt(newX)){
+					console.log('entre deux x: on peut pas descendre/monter');
 					//si entre deux cases, on ne peut pas descendre/monter
 				}else if(sDirection=='up'){
 					newY-=vitesse;
@@ -386,11 +409,15 @@ Game.prototype={
 					newYcheck+=1;
 				}
 				
-				if(this.checkCoord(newXcheck,newYcheck)){
+				if(this.checkCoord(newXcheck,newYcheck) || (newX==1 && newY==1)){	
 					//si les coordonnées est libre
 					oPerso.x=newX;
 					oPerso.y=newY;
 					
+				}else if(newX==1){
+					oPerso.x=newX;
+				}else if(newY==1){
+					oPerso.y=newY;
 				}
 				
 				//on dessine le personnage
