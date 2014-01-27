@@ -76,7 +76,7 @@ Bomb.prototype={
 				if(map.tMap[this.y][this.x+i]==1){
 					oImages.drawImageOnLayer(this.idImg,((this.x+i)*widthCase),(this.y*heightCase),widthCase,widthCase,'bomb');
 				}
-				if(map.tMap[this.y+i][this.x]==1){
+				if(map.tMap[this.y+i] && map.tMap[this.y+i][this.x]==1){
 					oImages.drawImageOnLayer(this.idImg,((this.x)*widthCase),((this.y+i)*heightCase),widthCase,widthCase,'bomb');
 				}
 			}

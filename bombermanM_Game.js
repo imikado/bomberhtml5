@@ -93,7 +93,12 @@ function Game(){
 	
 	socket.on('Game.listTeam',function(tTeamConnected){
 		
-		console.log('reception liste team');
+		for(var i=0;i<tTeam.length;i++){
+			var a=getById('button-'+tTeam[i]);
+			if(a){
+				a.style.display='block';
+			}
+		}
 		
 		for(var i=0;i< tTeamConnected.length;i++){
 			console.log('desactivation '+tTeamConnected[i]);
