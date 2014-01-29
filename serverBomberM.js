@@ -5,12 +5,44 @@ httpServer=http.createServer(function(req,res){
 
 httpServer.listen(1338);
 
-var io=require('socket.io').listen(httpServer);
+var io=require('socket.io').listen(httpServer,{ log: true });
 
 var iId=0;
 
 var tPerso=Array();
 var tBomb=Array();
+
+var tTeamConnected=Array();
+var tSocket=Array();
+var canvas;
+var game;
+var map;
+var oGame;
+var oImages;
+var oSound;
+var Perso=require('./bombermanM_PersoB.js');
+
+var Game=require('./bombermanM_GameB.js');
+var Map=require('./bombermanM_MapB.js');
+var Bomb=require('./bombermanM_BombB.js');
+
+
+var currentX=0;
+var currentY=0;
+
+var widthCase=40;
+var heightCase=40;
+
+var maxX=22;
+var maxY=17;
+
+var oLayer_map;
+var oLayer_perso;
+var oLayer_bomb;
+
+var fps=200;
+
+var socket; 
 
 function newGame(){
 	
@@ -20,7 +52,7 @@ function newGame(){
 	tPerso=Array();
 
 	//blue
-	oData=new Data();
+	oData=new Perso('perso','blue');
 	oData.team='blue';
 	oData.x=1;
 	oData.y=1;
@@ -30,7 +62,7 @@ function newGame(){
 	iId++;
 
 	//red
-	oData=new Data();
+	oData=new Perso('perso','red');
 	oData.team='red';
 	oData.x=19;
 	oData.y=1;
@@ -40,7 +72,7 @@ function newGame(){
 	iId++;
 
 	//green
-	oData=new Data();
+	oData=new Perso('perso','green');
 	oData.team='green';
 	oData.x=19;
 	oData.y=15;
@@ -50,7 +82,7 @@ function newGame(){
 	iId++;
 
 	//yellow
-	oData=new Data();
+	oData=new Perso('perso','yellow');
 	oData.team='yellow';
 	oData.x=1;
 	oData.y=15;
@@ -59,6 +91,22 @@ function newGame(){
 
 	iId++;
 
+	oGame=new Game;
+	
+	map = new Map();
+	
+	for(var i=0;i<tPerso.length;i++){
+		oGame.tPerso.push(tPerso[i]);
+	}
+	
+	run();
+}
+
+
+function run(){
+	oGame.refresh();
+	setTimeout(run,fps);
+	
 }
 
 
@@ -88,6 +136,16 @@ function getBombById(id){
 	}
 }
 
+function getTeamConnected(){
+	var tTeamConnectedB=Array();
+	for(var i=0;i< tColor.length;i++){
+		if(tTeamConnected[tColor[i]]==1){
+			tTeamConnectedB.push(tColor[i]);
+		}
+	}
+	return tTeamConnectedB;
+}
+
 
 var tColor=Array('blue','red','green','yellow');
 
@@ -95,19 +153,31 @@ newGame();
 
 io.sockets.on('connection', function(socket){
 	
-	
-	
-	console.log('connected ');
+	oGame.socket=socket;
+	//console.log('connected ');
 	
 	socket.on('connected',function(team){
 		for(var i=0;i< tBomb.length;i++){
 			socket.emit('Game.createBomb',tBomb[i].id,tBomb[i].team,'normal',tBomb[i].x,tBomb[i].y);
 		}
-
 		for(var i=0;i< tPerso.length;i++){
-			console.log('broadcast createPerso team:'+tPerso[i].team+' x:'+tPerso[i].x+' y:'+tPerso[i].y);
 			socket.emit('Game.createPerso',tPerso[i].id,tPerso[i].team,'john',tPerso[i].x,tPerso[i].y);
 		}
+		
+		var tTeamConnectedB=getTeamConnected();
+		
+		socket.emit('Game.listTeam',tTeamConnectedB);
+	});
+	
+	
+	
+	socket.on('setTeamBroadcast',function(team){
+		tTeamConnected[team]=1;
+		tSocket[socket.id]=team;
+		
+		var tTeamConnectedB=getTeamConnected();
+		
+		socket.broadcast.emit('Game.listTeam',tTeamConnectedB);
 	});
 	
 	socket.on('newGame',function(){
@@ -115,25 +185,31 @@ io.sockets.on('connection', function(socket){
 	});
 	
 	socket.on('Game.setTeamDirectionBroadcast',function( team,sDirection){
+		
+		oGame.setTeamDirection(team,sDirection);
+		
 		socket.broadcast.emit('Game.setTeamDirection',team,sDirection);
 		socket.emit('Game.setTeamDirection',team,sDirection);
 	});
 	
-	socket.on('Game.createBombBroadcast',function(team,name,x,y){
+	socket.on('Game.createBombBroadcast',function(team){
 		
-		var oBomb=new Data;
+		console.log('recup perso by team: '+tSocket[socket.id]);
+		var oPerso=oGame.getPersoByTeam(tSocket[socket.id]);
+		
+		var name='normal';
+		
+		var oBomb=new Bomb(name,team);
 		oBomb.id=iId;
-		oBomb.team=team;
-		oBomb.name=name;
-		oBomb.x=x;
-		oBomb.y=y;
+		oBomb.x=oPerso.getX();
+		oBomb.y=oPerso.getY();
 		
 		iId++;
 		
 		socket.emit('Game.createBomb',oBomb.id,oBomb.team,oBomb.name,oBomb.x,oBomb.y);
 		socket.broadcast.emit('Game.createBomb',oBomb.id,oBomb.team,oBomb.name,oBomb.x,oBomb.y);
 		
-		tBomb.push(oBomb);
+		oGame.tBomb.push(oBomb);
 		
 		
 	});
@@ -179,7 +255,7 @@ io.sockets.on('connection', function(socket){
 				tTmp.push(tBomb[i]);
 			}
 		}
-		tBomb=tTmp;
+		oGame.tBomb=tTmp;
 		
 		socket.broadcast.emit('Game.removeBombById',id);
 		socket.emit('Game.removeBombById',id);
@@ -187,7 +263,12 @@ io.sockets.on('connection', function(socket){
 	
 	
 	socket.on('disconnect', function () {
-		io.sockets.emit('user disconnected');
+		tTeamConnected[ tSocket[socket.id] ]=0;
+		
+		var tTeamConnectedB=getTeamConnected();
+		
+		socket.emit('Game.listTeam',tTeamConnectedB);
+		socket.broadcast.emit('Game.listTeam',tTeamConnectedB);
 	});
 	
 });

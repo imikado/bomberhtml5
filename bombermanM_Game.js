@@ -28,9 +28,10 @@ function Game(){
     this.tDirection['green']='';
     this.tDirection['yellow']='';
     
-    socket=io.connect('http://localhost:1338');
+    socket=io.connect('http://pnxt06:1338');
     
 	socket.on('Game.createPerso',function(id, team,name,x,y){
+		console.log('createPerso id:'+id + 'team : '+team);
 		var oPerso=new Perso(name,team);
 		oPerso.x=x;
 		oPerso.y=y;
@@ -52,6 +53,7 @@ function Game(){
 		}
 	});
 	socket.on('Perso.build',function(id,x,y){
+		console.log('get perso by id '+id);
 		var oPerso=oGame.getPersoById(id);
 		oPerso.clear();
 		oPerso.x=x;
@@ -76,9 +78,6 @@ function Game(){
 			oBomb.animate(action);
 		}
 	});
-	socket.on('Game.setTeamDirection',function(team,direction){
-		oGame.setTeamDirection(team,direction);
-	});
 	
 	socket.on('Game.createBomb',function(id,team,name,x,y){
 		var oBomb=new Bomb(name,team);
@@ -89,6 +88,10 @@ function Game(){
 		
 		oGame.tBomb.push(oBomb);
 		
+	});
+	
+	socket.on('Game.setTeamDirection',function(team,sDirection){
+		oGame.setTeamDirection(team,sDirection);
 	});
 	
 	socket.on('Game.listTeam',function(tTeamConnected){
@@ -119,23 +122,12 @@ function Game(){
 Game.prototype={
 	setTeam:function(team){
 		this.team=team;
-				
-		if(team=='blue'){
-			setTimeout(run,fps);
-		}
 		
 		getById('team').style.display='none';
 				
 		map.build();
-		this.refresh();
 		
 		socket.emit('setTeamBroadcast',team);
-	},
-	refresh:function(){
-		//on raffraichit les persos
-		oGame.refreshPerso();
-		//et les bombes
-		oGame.refreshBomb();
 	},
 	getPersoById:function(id){
 		for(var i=0;i< this.tPerso.length;i++){
@@ -158,9 +150,9 @@ Game.prototype={
 			}
 		}
 	},
-	createBombBroadcast:function(team,name,x,y){
-		console.log('socket create bomb'+team+' '+name+' x:'+x+' y:'+y);
-		socket.emit('Game.createBombBroadcast',team,name,x,y);
+	createBombBroadcast:function(team){
+		console.log('socket create bomb'+team);
+		socket.emit('Game.createBombBroadcast',team);
 	},
 	switchSound:function(object){
 		if(object.checked){
@@ -175,37 +167,6 @@ Game.prototype={
 	disableSound:function(){
 		this.bSound=0;
 	},
-	checkCoord:function(x,y){
-		y=parseInt(y+0);
-		x=parseInt(x+0);
-		if(this.tCoordBomb[ y ] && this.tCoordBomb[ y ][ x ] && this.tCoordBomb[ y ][ x ]!=''){
-			console.log('not libre tCoordBomb[ '+y+' ][ '+x+' ]');
-			return false;
-		}
-		
-		if(this.tCoordPerso[ y ] && this.tCoordPerso[ y ][ x ] && this.tCoordPerso[ y ][ x ]!=''){
-			console.log('not libre tCoordPerso[ '+y+' ][ '+x+' ]');
-			return false;
-		}
-		
-		if(map.tMap[y] && map.tMap[y][x] && map.tMap[y][x]==1){
-		
-			return true;
-			
-		}
-		return false;
-
-	},
-	isWalkable:function(x,y){
-		if(this.tCoordBomb[y] && this.tCoordBomb[y][x] && this.tCoordBomb[y][x]!=''){
-			return false;
-		}
-		
-		if(this.tCoordPerso[y] && this.tCoordPerso[y][x] && this.tCoordPerso[y][x]!=''){
-			return false;
-		}
-		return true;
-	},
 	resetKeys:function(){
 		this.setTeamDirectionBroadcast('');
 	},
@@ -215,14 +176,9 @@ Game.prototype={
 		//this.resetKeys();
 		
 		if(touche==32){ //espace
-			console.log('depot bombe');
-			//boucle perso pour savoir ou creer la bombe
-			var oPerso=this.getPersoByTeam(this.team);
-				
-			this.createBombBroadcast(oPerso.team,'normal',oPerso.getX(),oPerso.getY());
-			
-			//this.setTeamDirectionBroadcast(this.tDirection[sTeam]);
-				
+			console.log('depot bombe');	
+			this.createBombBroadcast();
+							
 		}else	if(touche==37){
 			this.setTeamDirectionBroadcast('left');
 		}else	if(touche==38){
@@ -247,38 +203,6 @@ Game.prototype={
 			this.setTeamDirectionBroadcast('');
 		}
 	},
-	saveBomb:function(oBomb){
-        //on recupere les coordonnées du batiment 
-        var y=parseInt(oBomb.y);
-        var x=parseInt(oBomb.x);
-            
-		//on enregistre dans un tableau indexé
-		//les nouvelles coordonnées
-		if(!this.tCoordBomb[y]){
-			this.tCoordBomb[y]=Array();
-		}
-
-		this.tCoordBomb[y][x]=oBomb;
-		
-		
-	},
-	clearBomb:function(oBomb){
-		var y=oBomb.y;
-		var x=oBomb.x;
-		
-		this.tCoordBomb[y][x]='';
-	},
-	removeBomb:function(oBomb){
-		var tBombTmp=Array();
-		for(var i=0;i<this.tBomb.length;i++){
-			if(this.tBomb[i].x != oBomb.x || this.tBomb[i].y != oBomb.y){
-				tBombTmp.push(this.tBomb[i]);
-			}
-		}
-		this.tBomb=tBombTmp;
-		
-		this.tCoordBomb[oBomb.y][oBomb.x]='';
-	},
 	getBomb:function(x,y){
 		y=parseInt(y);
 		x=parseInt(x);
@@ -287,22 +211,6 @@ Game.prototype={
 			return this.tCoordBomb[y][x];
 		}
 		return null;
-	},
-	clearPerso:function(oPerso){
-		
-		var y=oPerso.getY();
-		var x=oPerso.getX();
-		
-		if(!this.tCoordPerso[y]){ return; }
-		
-		this.tCoordPerso[y][x]='';
-		
-	},
-	removeBroadcastBombById:function(id){
-		socket.emit('Game.removeBroadcastBombById',id);
-	},
-	removeBroadcastPersoById:function(id){
-		socket.emit('Game.removeBroadcastPersoById',id);
 	},
 	removePerso:function(oPerso){
 		var tPersoTmp=Array();
@@ -315,19 +223,6 @@ Game.prototype={
 		
 		this.tCoordPerso[oPerso.getY()][oPerso.getX()]='';
 	},
-	savePerso:function(oPerso){
-		//on recupere les coordonnées de l'unité
-		var y=oPerso.getY();
-		var x=oPerso.getX();
-		
-		//on enregistre dans un tableau indexé
-		//les nouvelles coordonnées
-		if(!this.tCoordPerso[y]){
-			this.tCoordPerso[y]=Array();
-		}
-		this.tCoordPerso[y][x]=oPerso;
-				
-	},
 	getPerso:function(x,y){
 		//console.log('search x:'+x+' '+y);
 		if(this.tCoordPerso[y] &&  this.tCoordPerso[y][x]){
@@ -336,103 +231,6 @@ Game.prototype={
 		return null;
 	},
 	
-	refreshBomb:function(){
-            
-		for(var i=0;i< this.tBomb.length;i++){
-			var oBomb= this.tBomb[i];
-			if(oBomb.life < 14){
-				//pendant 14 iterations, on va alterner entre deux sprites
-				if(oBomb.life % 2 ){
-				oBomb.idImg='bomb-0';
-				}else{
-				oBomb.idImg='bomb-1';
-				}	
-			}else if(oBomb.life < 17){
-				//puis animation d'explosion
-				if(oBomb.life % 2 ){
-					oBomb.idImg='explosion';
-				}else{
-					oBomb.idImg='explosion-1';
-				}
-			}else if(oBomb.life < 19){
-				oBomb.idImg='explosion-2';
-			}else{
-				oBomb.idImg='explosion-finish';
-				
-			}
-			
-			oBomb.life++;
-			
-			//on broadcast l'animation de la bombe
-			oBomb.animateBroadcast(oBomb.idImg);
-		}
-                
-	},
-	refreshPerso:function(){
-		
-		//on boucle sur les persos existants
-		for(var i=0;i< this.tPerso.length;i++){
-			var oPerso= this.tPerso[i];
-			if(oPerso.life <=0){ continue;}
-			
-				var vitesse=0.5;
-				
-				if(!this.tDirection[oPerso.team]){
-					continue;
-				}
-				
-				var sDirection=this.tDirection[oPerso.team];
-				
-				//on efface le dessin sur le calques
-				oPerso.clear();
-				
-				//on initialise les nouvelles coordonnées
-				var newX=oPerso.x;
-				var newY=oPerso.y;
-				var newXcheck=oPerso.getX();
-				var newYcheck=oPerso.getY();
-				
-				
-				if(newY != parseInt(newY)){
-					console.log('entre deux y: on peut pas gauche/droite');
-					//si entre deux cases, on ne peut pas descendre/monter
-				}else if(sDirection=='right'){
-					newX+=vitesse;
-					newXcheck+=1;
-				}else if(sDirection=='left'){
-					newX-=vitesse;
-					newXcheck-=1;
-				}
-				if(newX != parseInt(newX)){
-					console.log('entre deux x: on peut pas descendre/monter');
-					//si entre deux cases, on ne peut pas descendre/monter
-				}else if(sDirection=='up'){
-					newY-=vitesse;
-					newYcheck-=1;
-				}else if(sDirection=='down'){
-					newY+=vitesse;
-					newYcheck+=1;
-				}
-				
-				if(this.checkCoord(newXcheck,newYcheck) || (newX==1 && newY==1)){	
-					//si les coordonnées est libre
-					oPerso.x=newX;
-					oPerso.y=newY;
-					
-				}else if(newX==1){
-					oPerso.x=newX;
-				}else if(newY==1){
-					oPerso.y=newY;
-				}
-				
-				//on dessine le personnage
-				oPerso.buildBroadcast('walking');
-				
-			
-		}
-		
-		
-	},
         
         
 };

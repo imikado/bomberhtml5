@@ -16,6 +16,7 @@ var maxY=17;
 
 var oLayer_map;
 var oLayer_perso;
+var oLayer_perso2;
 var oLayer_bomb;
 
 var fps=200;
@@ -66,6 +67,8 @@ Images.prototype={
 			oCanvasTmp=oLayer_map;
 		}else if(sLayer=='perso'){
 			oCanvasTmp=oLayer_perso;
+		}else if(sLayer=='perso2'){
+			oCanvasTmp=oLayer_perso2;
 		}else if(sLayer=='bomb'){
 			oCanvasTmp=oLayer_bomb;
 		}
@@ -152,6 +155,7 @@ function preload2(){
 	
 	oLayer_map=new Canvas('layer_map');
 	oLayer_perso=new Canvas('layer_perso');
+	oLayer_perso2=new Canvas('layer_perso2');
 	oLayer_bomb=new Canvas('layer_bomb');	
 	
 	
@@ -175,23 +179,10 @@ function load(){
 	
 	getById('team').style.display='block';
 	
-	//on construit la map, l'apercu 
-	//et le cadre d'information de la map affichée	 
+	//on construit la map
 	map.build(); 
 	
 }
-
-var iRefreshBuild=0;
-function run(){  
-	
-	//on raffraichit les persos et les bombes
-	oGame.refresh();
-	
-	
-	//dans N secondes on appelera de nouveau cette fonction 
-	setTimeout(run,fps);
-}
-
 
 
 

@@ -1,3 +1,6 @@
+var widthCase=40;
+var heightCase=40;
+
 function Bomb(name,team){
 	this.name=name;
 	this.oImage='';
@@ -112,12 +115,9 @@ Bomb.prototype={
 			
 			oGame.removeBroadcastBombById(this.id);
 			return;
-		}else{
-			oLayer_bomb.clearRect((this.x*widthCase),(this.y*heightCase),widthCase,widthCase);
 		}
-				
-		oImages.drawImageOnLayer(this.idImg,(this.x*widthCase),(this.y*heightCase),widthCase,widthCase,'bomb');
-			
+							
+		oGame.saveBomb(this);
 		
 	},
 	clear:function(){
@@ -127,3 +127,5 @@ Bomb.prototype={
 	},
 
 };
+
+module.exports=Bomb;
