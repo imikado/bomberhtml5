@@ -28,7 +28,7 @@ function Game(){
     this.tDirection['green']='';
     this.tDirection['yellow']='';
     
-    socket=io.connect('http://pnxt06:1338');
+    socket=io.connect('http://localhost:1338');
     
 	socket.on('Game.createPerso',function(id, team,name,x,y){
 		console.log('createPerso id:'+id + 'team : '+team);
